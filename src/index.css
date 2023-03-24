@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Acme&family=Pacifico&family=Poppins:wght@200;300;400&family=Roboto+Condensed&family=Roboto:wght@300;500&display=swap');
+/* Set default styles for body and specify font family */
+body {
+	margin: 0;
+	padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background-color: #833e58;
+}
+/* Style for displaying code using monospace font */
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+		monospace;
+}
+/* Import and setup Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Define transition effects for various elements */
+.dashboard> div ,
+.dropdown,
+.exchangeBtn,
+.timePeriodItem{
+	transition: all 0.2s linear;
+}
+
+.tracker{
+	transition: all 0.1s linear;
+}
+
+/* Set font family for root element */
+#root{
+	font-family: 'Poppins', sans-serif;
+	font-weight: 700;
+}
+
+/* Hide scrollbar for droplist and coinlist classes */
+.droplist::-webkit-scrollbar {
+    display: none;
+}
+.coinlist::-webkit-scrollbar {
+    display: none;
+}
+
+/* Prevent user from selecting and copying text on page */
+*{
+	user-select: none;
+}
+
+/* Apply specific styles when screen width is below 600px */
+@media only screen and (max-width:600px){
+    .alert{
+        bottom:6rem;
+    }
+}
