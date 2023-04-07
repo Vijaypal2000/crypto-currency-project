@@ -20,22 +20,19 @@ export const getCoins = createAsyncThunk("getCoins", async (currency) => {
 // Define another async thunk to fetch data for a single coin's market chart
 export const getChartData = createAsyncThunk(
 	"getChartData",
-	async ({chartList,timePeriod,currency}) => {
+	async ({ currentCoin, timePeriod, currency }) => {
 		// Make a fetch request to the Coingecko API with the specified parameters
 		let interval;
-		if(timePeriod>5 && timePeriod<70){
-			interval='daily'
-		}
-		else if(timePeriod>70 && timePeriod<190){
-			interval='monthly'
-		}
-		else if (timePeriod>=190){
-			interval='yearly'
-		}
-		else interval='hourly'
+		if (timePeriod > 5 && timePeriod < 70) {
+			interval = "daily";
+		} else if (timePeriod > 70 && timePeriod < 190) {
+			interval = "monthly";
+		} else if (timePeriod >= 190) {
+			interval = "yearly";
+		} else interval = "hourly";
 
-		const response1 = await fetch(
-			`https://api.coingecko.com/api/v3/coins/${chartList[0]}/market_chart?vs_currency=${currency}&days=${timePeriod}&interval=${interval}`,
+		const response = await fetch(
+			`https://api.coingecko.com/api/v3/coins/${currentCoin}/market_chart?vs_currency=${currency}&days=${timePeriod}&interval=${interval}`,
 			{
 				method: "GET",
 				headers: {
@@ -43,24 +40,11 @@ export const getChartData = createAsyncThunk(
 				},
 			}
 		);
-
-		if(chartList[1]!==undefined)
-		var response2 = await fetch(
-			`https://api.coingecko.com/api/v3/coins/${chartList[1]}/market_chart?vs_currency=${currency}&days=${timePeriod}&interval=${interval}`,
-			{
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		// const res = { response: response.json(), coin: currentCoin };
+		console.log("chart");
+		return response.json().then((result) => {
+			return { result, currentCoin };
+		});
 		// Convert the response to a JSON object and return it
-		if(chartList[1]===undefined)
-		return Promise.allSettled([response1.json()])
-		else return Promise.allSettled([response1.json(),response2.json()]) 
-
-
 	}
 );
-
-

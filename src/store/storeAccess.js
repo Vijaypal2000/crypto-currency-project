@@ -1,4 +1,3 @@
-
 import { useSelector } from "react-redux";
 
 // This custom hook is named useAppSelector and it uses the useSelector hook from the react-redux library to select and return parts of the state.
@@ -15,7 +14,7 @@ export const useAppSelector = () => {
 				dropName: currencyDropName,
 			},
 			crypto: { dropName: cryptoDropName, dropList: cryptoList, currentCoin },
-			chartType: { dropName: chartType, currentChartType ,chartTypeList},
+			chartType: { dropName: chartType, currentChartType },
 			timePeriod: { time: timePeriod, range: chartRange, timePeriodList },
 			sell: { dropName: sellDropName, dropList: sellList, coin: sellCoin },
 			buy: { dropName: buyDropName, dropList: buyList, coin: buyCoin },
@@ -24,7 +23,7 @@ export const useAppSelector = () => {
 		},
 		alert,
 		theme,
-		chart: { chartList,reload:chartReload },
+		chart: { chartList, reload: chartReload },
 		coins,
 		phone: { chartDisplay },
 		watch: { list: WatchList },
@@ -32,13 +31,15 @@ export const useAppSelector = () => {
 		pieItem: PieItem,
 	} = useSelector((state) => state);
 
-	// Another way of selecting a specific property from the state is by calling useSelector and passing in a function that returns the desired property. 
+	// Another way of selecting a specific property from the state is by calling useSelector and passing in a function that returns the desired property.
 	// Here, the chart object is selected from the state.
-    const chart= useSelector(state=>state.chart)
-    
-	// These variables are assigned values from the first two items in the chartList array.
+	const chart = useSelector((state) => state.chart);
 
-		// The parts of the state that are needed by the component that uses this hook are returned as an object.
+	// These variables are assigned values from the first two items in the chartList array.
+	const firstchartitem = chartList[0];
+	const secondchartitem = chartList[1];
+
+	// The parts of the state that are needed by the component that uses this hook are returned as an object.
 	return {
 		currency,
 		alert,
@@ -48,12 +49,13 @@ export const useAppSelector = () => {
 		cryptoList,
 		chartType,
 		chartDisplay,
+		firstchartitem,
+		secondchartitem,
 		timePeriod,
 		currentCoin,
 		timePeriodList,
 		chart,
 		coins,
-		chartTypeList,
 		currencySymbol,
 		WatchList,
 		currencyList,

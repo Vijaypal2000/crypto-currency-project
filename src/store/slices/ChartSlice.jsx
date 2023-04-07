@@ -4,65 +4,81 @@ import { getChartData } from "../../api";
 const ChartSlice = createSlice({
 	name: "chart",
 	initialState: {
-		all:{isLoading:false,isError:false},
-		coin1: { data: [], isError: false },
-		coin2: { data: [], isError: false },
-		chartList: ['bitcoin'],
-		reload:true,
-	},reducers:{
+		coinNo: 1,
+		coin1: { isLoading: false, data: [], isError: false },
+		coin2: { isLoading: false, data: [], isError: false },
+		chartList: ["bitcoin"],
+		reload: true,
+	},
+	reducers: {
 		// Reducer to set the first item in chart list
-		setFirstItemChartList(state,action){
-			state.reload=true;
-			state.chartList[0]=action.payload
+		setFirstItemChartList(state, action) {
+			state.reload = true;
+			state.chartList[0] = action.payload;
+			state.coinNo = 1;
 		},
 		// Reducer to set the second item in chart list
-		setSecondItemChartList(state,action){
-			state.reload=true
-			state.chartList[1]=action.payload
+		setSecondItemChartList(state, action) {
+			state.reload = true;
+			state.chartList[1] = action.payload;
+			state.coinNo = 2;
 		},
-		removeSecondItemChartList(state,action){
-			state.reload=false
-			state.chartList.splice(1,1);
-			state.coin2.data=[]
+		removeSecondItemChartList(state, action) {
+			state.reload = false;
+			state.chartList.splice(1, 1);
+			state.coin2.data = [];
 		},
-		interchangeChartItems(state,action){
-			state.reload=false;
-			state.coin1.data=state.coin2.data
-			state.coin2.data=[]
-			state.chartList[0]=state.chartList[1]
-			state.chartList.splice(1,1)
+		interchangeChartItems(state, action) {
+			state.reload = false;
+			state.coin1.data = state.coin2.data;
+			state.coin2.data = [];
+			state.chartList[0] = state.chartList[1];
+			state.chartList.splice(1, 1);
+			state.coinNo = 1;
 		},
-		setChartReload(state,action){
-			state.reload=action.payload
-		}
+		setChartReload(state, action) {
+			state.reload = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		// Case to handle successful data fetch
 		builder.addCase(getChartData.fulfilled, (state, action) => {
-			state.all.isLoading = false;
-			if(action.payload[0].status==='fulfilled'){
-				state.coin1.data=action.payload[0].value.prices
+			let coin = action.payload.currentCoin;
+			if (coin === state.chartList[0]) {
+				state.coin1.isLoading = false;
+				state.coin1.isError = false;
+				state.coin1.data = action.payload.result.prices;
+				if (state.chartList.length !== 1) state.coinNo = 2;
+			} else if (coin === state.chartList[1]) {
+				state.coin2.isLoading = false;
+				state.coin2.isError = false;
+				state.coin2.data = action.payload.result.prices;
+				if (state.chartList.length !== 1) state.coinNo = 1;
 			}
-			else if(action.payload[0].status==='rejected'){
-				state.coin1.isError=true
-			}
-
-			if(action.payload[1]!==undefined)
-			{if (action.payload[1].status === "fulfilled") {
-				state.coin2.data = action.payload[1].value.prices;
-			}
-			else if (action.payload[1].status === "rejected") {
-				state.coin2.isError = true;
-			} }
 		});
 		// Case to handle data fetch in progress
 		builder.addCase(getChartData.pending, (state, action) => {
-			state.all.isLoading=true
+			if (state.coinNo === 1) {
+				state.coin1.isLoading = true;
+				state.coin1.isError = false;
+			} else if (state.coinNo === 2) {
+				state.coin2.isLoading = true;
+				state.coin2.isError = false;
+			}
 		});
 		// Case to handle data fetch failure
 		builder.addCase(getChartData.rejected, (state, action) => {
-			state.all.isError=true
-			state.all.isLoading=false
+			console.log("error");
+			if (state.coinNo === 1) {
+				state.coin1.isLoading = false;
+				state.coin1.isError = true;
+				console.log(state.chartList.length);
+				if (state.chartList.length !== 1) state.coinNo = 2;
+			} else if (state.coinNo === 2) {
+				state.coin2.isLoading = false;
+				state.coin2.isError = true;
+				if (state.chartList.length !== 1) state.coinNo = 1;
+			}
 		});
 	},
 });

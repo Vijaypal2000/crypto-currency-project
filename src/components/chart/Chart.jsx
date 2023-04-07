@@ -1,10 +1,8 @@
 import React, { useEffect } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { useDispatch} from "react-redux";
-
+import { useDispatch } from "react-redux";
 import { getChartData } from "../../api";
 import { setCryptoDropName, setCryptoList } from "../../store/slices/DropSlice";
-import { setChartReload } from "../../store/slices/ChartSlice";
 
 import ChartType from "./ChartType";
 import CoinDetail from "./CoinDetail";
@@ -14,7 +12,7 @@ import LineChart from "./LineChart";
 import TimePeriodItem from "./TimePeriodItem";
 import HorizontalBarChart from "./HorizontalBarChart";
 import VerticalBarChart from "./VerticalBarChart";
-import { useAppSelector } from "../../store/storeAccess";
+import { setChartReload } from "../../store/slices/ChartSlice";
 
 const Chart = React.memo(
 	({
@@ -25,22 +23,25 @@ const Chart = React.memo(
 		cryptoList,
 		chartType,
 		chartDisplay,
-		chartList,
+		firstchartitem,
+		secondchartitem,
 		timePeriod,
 		currency,
 		timePeriodList,
 		chart,
 		chartReload,
 	}) => {
-
-		const {chartTypeList}=useAppSelector();
 		const dispatch = useDispatch();
-
 		useEffect(() => {
 			dispatch(setCryptoList(coins.data));
 		}, [dispatch, coins.data]);
 
-		// all crypto dropdown functions 
+		const arr = [
+			{ itemname: "Line" },
+			{ itemname: "Bar" },
+			{ itemname: "Hor..Bar" },
+		];
+
 		const showCryptoList = () => {
 			document.getElementById("cryptoDroplist").style.display = "flex";
 		};
@@ -69,7 +70,6 @@ const Chart = React.memo(
 				: dispatch(setCryptoList(dummyList));
 		};
 
-		//  all chartType dropdown functions
 		const showChartList = () => {
 			document.getElementById("chartTypeDroplist").style.display = "flex";
 		};
@@ -82,13 +82,21 @@ const Chart = React.memo(
 			dropListState === "none" ? showChartList() : hideChartList();
 		};
 
-		// fetching chartdata from coingecko api
 		useEffect(() => {
+			let currentCoin = firstchartitem;
 			if (chartReload === true)
-				dispatch(getChartData({ chartList, timePeriod, currency }));
+				dispatch(getChartData({ currentCoin, timePeriod, currency }));
 			else dispatch(setChartReload(true));
 			// eslint-disable-next-line
-		}, [dispatch, chartList, timePeriod, currency]);
+		}, [dispatch, firstchartitem, timePeriod, currency]);
+
+		useEffect(() => {
+			let currentCoin = secondchartitem;
+			if (currentCoin !== undefined && chartReload === true)
+				dispatch(getChartData({ currentCoin, timePeriod, currency }));
+			else dispatch(setChartReload(true));
+			// eslint-disable-next-line
+		}, [dispatch, secondchartitem, timePeriod, currency]);
 
 		return (
 			<>
@@ -114,6 +122,7 @@ const Chart = React.memo(
 						return <TimePeriodItem key={index} timePeriod={item.timePeriod} />;
 					})}
 				</div>
+
 				{/* timePeriod  */}
 
 				<div className=" lg:col-span-4 md:col-span-7 sm:col-span-6 sm:col-start-4 flex items-center justify-end gap-4 lg:w-4/5 justify-self-end md:w-auto sm:gap-1 lg:gap-4">
@@ -181,7 +190,7 @@ const Chart = React.memo(
 							style={{ display: "none" }}
 							onMouseLeave={hideChartList}
 							onClick={handleChartClick}>
-							{chartTypeList.map((item) => {
+							{arr.map((item) => {
 								return (
 									<ChartType key={item.itemname} itemname={item.itemname} />
 								);
@@ -203,7 +212,10 @@ const Chart = React.memo(
 						}`}>
 						{<CoinDetail />}
 					</div>
-					{chart.all.isLoading === false ? (
+					{chart.coin2.isLoading === false &&
+					chart.coin1.isLoading === false ? (
+						chart.coin1.data !== [] &&
+						chart.coin2.data !== [] &&
 						coins.data[0] && (
 							<div
 								className={`LineChart h-full lg:w-3/4 md:w-3/4 lg:min-w-20 md:min-w-20 sm:w-full sm:${chartDisplay}`}>
@@ -221,7 +233,6 @@ const Chart = React.memo(
 						</div>
 					)}
 				</div>
-				{/* chart  */}
 			</>
 		);
 	}
